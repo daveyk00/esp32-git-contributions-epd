@@ -52,7 +52,7 @@ void drawCommitGraph(JsonArray contributions)
     display.setTextColor(GxEPD_WHITE);
     display.setTextSize(1);
 
-    delay(5000);
+    // delay(5000);
 
     if (!screenInitialized)
     {
@@ -64,7 +64,7 @@ void drawCommitGraph(JsonArray contributions)
         Serial.println("Skipping screen initialization.");
     }
 
-    delay(5000);
+    // delay(5000);
     Serial.println("drawing squares");
 
     // GxEPD_WHITE, GxEPD_LIGHTGREY, GxEPD_DARKGREY, GxEPD_BLACK

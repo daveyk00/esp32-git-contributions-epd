@@ -9,7 +9,9 @@ WifiCredentials credentials[] = {
     {"Pixel_3588", "password"},
 };
 
-const char *url = "https://contributions-api.harryab.com/harryhighpants?weeks=17";
+const int weeks = 17;
+String url = "https://contributions-api.harryab.com/harryhighpants?weeks=" + String(weeks);
+RTC_DATA_ATTR int lastContributions[weeks * 7];
 
 void setup()
 {
@@ -31,6 +33,13 @@ void setup()
     sleep();
   }
 
+  if (!haveContributionsChanged(contributions))
+  {
+    Serial.println("No changes in contributions");
+    sleep();
+  }
+
+  storeContributions(contributions);
   drawCommitGraph(contributions);
   sleep();
 }
@@ -38,10 +47,32 @@ void setup()
 void sleep()
 {
   Serial.println("Going to sleep for 1 hour");
-  // esp_deep_sleep(3600e6); // 1 hour
-  esp_deep_sleep(10e6);
+  esp_deep_sleep(3600e6); // 1 hour
+  // esp_deep_sleep(10e6); // 10 seconds
 }
 
 void loop()
 {
+}
+
+// Store the contributions in RTC memory
+void storeContributions(JsonArray contributions)
+{
+  for (size_t i = 0; i < contributions.size() && i < sizeof(lastContributions) / sizeof(lastContributions[0]); i++)
+  {
+    lastContributions[i] = contributions[i].as<int>();
+  }
+}
+
+// Compare new contributions with the last stored contributions
+bool haveContributionsChanged(JsonArray contributions)
+{
+  for (size_t i = 0; i < contributions.size() && i < sizeof(lastContributions) / sizeof(lastContributions[0]); i++)
+  {
+    if (contributions[i].as<int>() != lastContributions[i])
+    {
+      return true;
+    }
+  }
+  return false;
 }

@@ -36,7 +36,7 @@ bool TryConnectWifi(WifiCredentials credentials[], int numCredentials)
     return false;
 }
 
-JsonArray FetchContributionsData(JsonDocument &doc, const char *url)
+JsonArray FetchContributionsData(JsonDocument &doc, String url)
 {
     WiFiClientSecure client;
     HTTPClient http;
