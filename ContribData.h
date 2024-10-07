@@ -11,10 +11,10 @@ struct WifiCredentials
 };
 
 // Try to connect to wifi using a list of credentials
-bool TryConnectWifi(WifiCredentials credentials[])
+bool TryConnectWifi(WifiCredentials credentials[], int numCredentials)
 {
     const unsigned long timeout = 6000; // 6 seconds timeout
-    for (int i = 0; i < sizeof(credentials) / sizeof(credentials[0]); i++)
+    for (int i = 0; i < numCredentials; i++)
     {
         WiFi.begin(credentials[i].ssid, credentials[i].password);
         Serial.print("\nConnecting to Wifi: ");
@@ -60,12 +60,6 @@ JsonArray FetchContributionsData(JsonDocument &doc, const char *url)
         Serial.println(error.c_str());
         http.end();
         return JsonArray(); // Return an empty array if parsing fails
-    }
-
-    Serial.println("Got contributions:");
-    for (JsonVariant contribution : contributions)
-    {
-        Serial.println(contribution.as<int>());
     }
 
     http.end();

@@ -1,4 +1,5 @@
 #include <WiFi.h>
+#include <ArduinoJson.h>
 #include <Rendering.h>
 #include <ContribData.h>
 
@@ -13,7 +14,7 @@ const char *url = "https://contributions-api.harryab.com/harryhighpants?weeks=17
 void setup()
 {
   Serial.begin(115200);
-  bool connected = TryConnectWifi(credentials);
+  bool connected = TryConnectWifi(credentials, sizeof(credentials) / sizeof(credentials[0]));
   if (!connected)
   {
     // TODO: show wifi error icon on screen
@@ -37,7 +38,8 @@ void setup()
 void sleep()
 {
   Serial.println("Going to sleep for 1 hour");
-  ESP.deepSleep(3600e6); // 1 hour
+  // esp_deep_sleep(3600e6); // 1 hour
+  esp_deep_sleep(10e6);
 }
 
 void loop()
