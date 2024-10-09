@@ -3,8 +3,8 @@
 #include <GithubIcon.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
 
+#define BAT_TEST_PIN 35
 GxEPD2_4G_4G<GxEPD2_213_GDEY0213B74, GxEPD2_213_GDEY0213B74::HEIGHT> display(GxEPD2_213_GDEY0213B74(/*CS=5*/ SS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4)); // GDEY0213B74 122x250, SSD1680, (FPC-A002 20.04.08)
-RTC_DATA_ATTR bool screenInitialized = false;
 
 uint16_t GetColor(int level)
 {
@@ -25,47 +25,29 @@ uint16_t GetColor(int level)
     }
 }
 
-void InitContainer()
+void DrawHeader()
 {
-    Serial.println("RenderContainer");
-    do
-    {
-        // Set background
-        display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
+    // Draw Github icon
+    display.drawBitmap(7, 8, GithubIcon, 16, 16, GxEPD_WHITE);
 
-        // Draw Github icon
-        display.drawBitmap(7, 8, GithubIcon, 16, 16, GxEPD_WHITE);
+    // Draw username
+    display.setCursor(29, 13);
+    display.print("/HarryHighPants");
 
-        // Draw username
-        display.setCursor(29, 13);
-        display.print("/HarryHighPants");
-
-    } while (display.nextPage());
-    screenInitialized = true;
+    // Draw battery percentage
+    display.setCursor(225, 13);
+    int adcValue = analogRead(BAT_TEST_PIN);
+    float voltage = (adcValue / 4095.0) * 3.3 * 2;
+    long percentage = map(voltage * 1000, 3200, 3900, 0, 100); // Use millivolts for mapping
+    display.printf("%ld%%", percentage);
 }
 
 void drawCommitGraph(JsonArray contributions)
 {
-    Serial.println("drawCommitGraph");
     display.init(115200);
     display.setRotation(1); // Landscape
     display.setTextColor(GxEPD_WHITE);
     display.setTextSize(1);
-
-    // delay(5000);
-
-    if (!screenInitialized)
-    {
-        InitContainer();
-        screenInitialized = true;
-    }
-    else
-    {
-        Serial.println("Skipping screen initialization.");
-    }
-
-    // delay(5000);
-    Serial.println("drawing squares");
 
     // GxEPD_WHITE, GxEPD_LIGHTGREY, GxEPD_DARKGREY, GxEPD_BLACK
     int columns = 17;
@@ -79,6 +61,11 @@ void drawCommitGraph(JsonArray contributions)
     int xOffset = 5;
     do
     {
+        // Set background
+        display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
+        
+        DrawHeader();
+
         // Draw squares
         for (int column = 0; column < columns; column++)
         {
