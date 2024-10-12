@@ -59,35 +59,34 @@ void drawCommitGraph(JsonArray contributions)
     int borderThickness = 3;
     int yOffset = 24;
     int xOffset = 5;
-    do
+
+    // Set background
+    display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
+
+    DrawHeader();
+
+    // Draw squares
+    for (int column = 0; column < columns; column++)
     {
-        // Set background
-        display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
-        
-        DrawHeader();
-
-        // Draw squares
-        for (int column = 0; column < columns; column++)
+        for (int row = 0; row < rows; row++)
         {
-            for (int row = 0; row < rows; row++)
+            int squareX = column * gridSize + xOffset + squareMargin;
+            int squareY = row * gridSize + yOffset + squareMargin;
+            int index = rows * column + row;
+            int level = contributions[index].as<int>();
+
+            // Set a partial window for the specific square area
+            // display.setPartialWindow(squareX, squareY, squareSize, squareSize);
+            display.fillRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level));
+            display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level + 1));
+
+            int isToday = level != -1 && (index == total - 1 || contributions[index + 1].as<int>() == -1);
+            if (isToday)
             {
-                int squareX = column * gridSize + xOffset + squareMargin;
-                int squareY = row * gridSize + yOffset + squareMargin;
-                int index = rows * column + row;
-                int level = contributions[index].as<int>();
-
-                // Set a partial window for the specific square area
-                // display.setPartialWindow(squareX, squareY, squareSize, squareSize);
-                display.fillRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level));
-                display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level + 1));
-
-                int isToday = level != -1 && (index == total - 1 || contributions[index + 1].as<int>() == -1);
-                if (isToday)
-                {
-                    display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GxEPD_WHITE);
-                }
+                display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GxEPD_WHITE);
             }
         }
-    } while (display.nextPage());
+    }
+    display.displayWindow(0, 0, display.width(), display.height());
     display.hibernate();
 }
