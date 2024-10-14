@@ -10,15 +10,22 @@ struct WifiCredentials
     const char *password;
 };
 
+// Store the last valid credentials in RTC memory
+RTC_DATA_ATTR int lastConnectedIndex = -1;
+
 // Try to connect to wifi using a list of credentials
 bool TryConnectWifi(WifiCredentials credentials[], int numCredentials)
 {
     const unsigned long timeout = 6000; // 6 seconds timeout
-    for (int i = 0; i < numCredentials; i++)
+    for (int i = -1; i < numCredentials; i++)
     {
-        WiFi.begin(credentials[i].ssid, credentials[i].password);
+        if (i == lastConnectedIndex)
+            continue;
+        const int credentialIndex = i == -1 ? lastConnectedIndex : i;
+
+        WiFi.begin(credentials[credentialIndex].ssid, credentials[credentialIndex].password);
         Serial.print("\nConnecting to Wifi: ");
-        Serial.println(credentials[i].ssid);
+        Serial.println(credentials[credentialIndex].ssid);
         unsigned long startAttemptTime = millis();
         while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout)
         {
@@ -29,6 +36,7 @@ bool TryConnectWifi(WifiCredentials credentials[], int numCredentials)
         if (WiFi.status() == WL_CONNECTED)
         {
             Serial.println("\nWiFi connected");
+            lastConnectedIndex = credentialIndex;
             return true;
         }
     }

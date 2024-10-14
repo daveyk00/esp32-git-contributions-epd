@@ -4,8 +4,8 @@
 #include <ContribData.h>
 
 WifiCredentials credentials[] = {
-    {"YourWifiSSID-2G", "password"},
     {"Hindsite Guest", "password"},
+    {"YourWifiSSID-2G", "password"},
     {"Pixel_3588", "password"},
 };
 
