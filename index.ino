@@ -3,6 +3,8 @@
 #include <Rendering.h>
 #include <ContribData.h>
 
+#define BUTTON_PIN 39 // GPIO39 (IO39) is the pin connected to the button
+
 WifiCredentials credentials[] = {
     {"Hindsite Guest", "password"},
     {"YourWifiSSID-2G", "password"},
@@ -16,6 +18,33 @@ RTC_DATA_ATTR int lastContributions[weeks * 7];
 void setup()
 {
   Serial.begin(115200);
+  pinMode(BUTTON_PIN, INPUT);
+
+  esp_sleep_wakeup_cause_t wakeup_reason = esp_sleep_get_wakeup_cause();
+  switch (wakeup_reason)
+  {
+  case ESP_SLEEP_WAKEUP_EXT0: // Wakeup caused by GPIO (external wakeup)
+    Serial.println("Wakeup caused by external signal using GPIO (button press)");
+    // Check for button hold
+    if (digitalRead(BUTTON_PIN) == LOW)
+    {
+      Serial.println("Continue holding to do something special");
+      delay(2000);
+      if (digitalRead(BUTTON_PIN) == LOW)
+      {
+        Serial.println("Special action");
+      }
+    }
+
+    break;
+  case ESP_SLEEP_WAKEUP_TIMER: // Wakeup caused by the timer
+    Serial.println("Wakeup caused by timer (deep sleep duration complete)");
+    break;
+  default: // Other wakeup reasons
+    Serial.printf("Wakeup not caused by deep sleep: %d\n", wakeup_reason);
+    break;
+  }
+
   bool connected = TryConnectWifi(credentials, sizeof(credentials) / sizeof(credentials[0]));
   if (!connected)
   {
@@ -46,14 +75,15 @@ void setup()
 
 void sleep()
 {
+  // Set up GPIO39 as a wakeup source on LOW signal (when the button is pressed)
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, LOW);
+
   Serial.println("Going to sleep for 1 hour");
   esp_deep_sleep(3600e6); // 1 hour
   // esp_deep_sleep(10e6); // 10 seconds
 }
 
-void loop()
-{
-}
+void loop() {}
 
 // Store the contributions in RTC memory
 void storeContributions(JsonArray contributions)
