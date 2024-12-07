@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 #include <Rendering.h>
 #include <ContribData.h>
+#include <ConfigAccessPoint.h>
 
 #define BUTTON_PIN 39 // GPIO39 (IO39) is the pin connected to the button
 
@@ -14,6 +15,7 @@ WifiCredentials credentials[] = {
 const int weeks = 17;
 String url = "https://contributions-api.harryab.com/harryhighpants?weeks=" + String(weeks);
 RTC_DATA_ATTR int lastContributions[weeks * 7];
+bool isConfigMode = false;
 
 void setup()
 {
@@ -28,11 +30,15 @@ void setup()
     // Check for button hold
     if (digitalRead(BUTTON_PIN) == LOW)
     {
-      Serial.println("Continue holding to do something special");
+      Serial.println("Continue holding to start config");
       delay(2000);
       if (digitalRead(BUTTON_PIN) == LOW)
       {
-        Serial.println("Special action");
+        Serial.println("Starting config server");
+        isConfigMode = true;
+        storeContributions(JsonArray());
+        startConfigServer();
+        return;
       }
     }
 
@@ -73,6 +79,13 @@ void setup()
   sleep();
 }
 
+void loop() {
+  if (!isConfigMode) return;
+  // delay(500);
+  // Serial.println("Loop config server hande");
+  handleConfigClient();
+}
+
 void sleep()
 {
   // Set up GPIO39 as a wakeup source on LOW signal (when the button is pressed)
@@ -82,8 +95,6 @@ void sleep()
   esp_deep_sleep(3600e6); // 1 hour
   // esp_deep_sleep(10e6); // 10 seconds
 }
-
-void loop() {}
 
 // Store the contributions in RTC memory
 void storeContributions(JsonArray contributions)
