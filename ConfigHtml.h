@@ -2,6 +2,7 @@ const char configHtml[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">
   <title>Configuration Page</title>
 </head>
 <body>

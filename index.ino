@@ -37,6 +37,7 @@ void setup()
         Serial.println("Starting config server");
         isConfigMode = true;
         storeContributions(JsonArray());
+        drawConfigModeScreen();
         startConfigServer();
         return;
       }
@@ -81,8 +82,7 @@ void setup()
 
 void loop() {
   if (!isConfigMode) return;
-  // delay(500);
-  // Serial.println("Loop config server hande");
+  delay(100);
   handleConfigClient();
 }
 
