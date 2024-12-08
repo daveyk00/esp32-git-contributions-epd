@@ -1,4 +1,4 @@
-<!-- const char configHtml[] PROGMEM = R"rawliteral( -->
+const char configHtml[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -54,13 +54,14 @@
         background-color: #2e2e3e;
         padding: 2rem;
         margin: 2rem;
+        margin-top: 0;
         border-radius: 8px;
         width: 90%;
         max-width: 350px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       "
     >
-      <h1
+      <pre
         style="
           font-size: 0.4rem;
           text-align: center;
@@ -71,17 +72,15 @@
           white-space: pre-line;
         "
       >
-        ░█████╗░░█████╗░███╗░░██╗███████╗██╗░██████╗░
-        ██╔══██╗██╔══██╗████╗░██║██╔════╝██║██╔════╝░
-        ██║░░╚═╝██║░░██║██╔██╗██║█████╗░░██║██║░░██╗░
-        ██║░░██╗██║░░██║██║╚████║██╔══╝░░██║██║░░╚██╗
-        ╚█████╔╝╚█████╔╝██║░╚███║██║░░░░░██║╚██████╔╝
-        ░╚════╝░░╚════╝░╚═╝░░╚══╝╚═╝░░░░░╚═╝░╚═════╝░
-      </h1>
-      <form
-        onsubmit="handleSubmit(event)"
-        style="display: flex; flex-direction: column"
-      >
+
+&nbsp;█████╗░░█████╗░███╗░░██╗███████╗██╗░██████╗&nbsp;
+██╔══██╗██╔══██╗████╗░██║██╔════╝██║██╔════╝&nbsp;
+██║░░╚═╝██║░░██║██╔██╗██║█████╗░░██║██║░░██╗&nbsp;
+██║░░██╗██║░░██║██║╚████║██╔══╝░░██║██║░░╚██╗
+╚█████╔╝╚█████╔╝██║░╚███║██║░░░░░██║╚██████╔╝
+&nbsp;╚════╝░░╚════╝░╚═╝░░╚══╝╚═╝░░░░░╚═╝░╚═════╝&nbsp;
+      </pre>
+      <form action="/submit" style="display: flex; flex-direction: column">
         <!-- Github Username -->
         <label for="username">Github Username</label>
         <div style="display: flex; align-items: center">
@@ -154,15 +153,6 @@
         </button>
       </form>
     </div>
-
-    <script>
-      function handleSubmit(event) {
-        event.preventDefault()
-        const form = event.target
-        const params = new URLSearchParams(new FormData(form))
-        window.location.href = `?${params.toString()}`
-      }
-    </script>
   </body>
 </html>
-<!-- )rawliteral"; -->
+)rawliteral";
