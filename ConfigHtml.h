@@ -105,7 +105,7 @@ const char configHtml[] PROGMEM = R"rawliteral(
         </div>
 
         <!-- WiFi Credentials -->
-        <label for="wifi-ssid">Wifi SSID</label>
+        <label for="wifi-ssid">Wifi SSID (2.4Ghz only)</label>
         <input
           type="text"
           value="{{wifi-ssid}}"
@@ -134,11 +134,12 @@ const char configHtml[] PROGMEM = R"rawliteral(
         />
 
         <!-- API URL -->
-        <label for="interval">API url</label>
+        <label for="interval">API url override (optional)</label>
         <input
           type="url"
+          value="{{url}}"
           name="url"
-          placeholder="https://contributions-api.harryab.com/harryhighpants?weeks="
+          placeholder="https://contributions-api.harryab.com/"
         />
 
         <button

@@ -2,10 +2,13 @@
 #include <GxEPD2_4G_4G.h>
 #include <GithubIcon.h>
 #include <WifiIcon.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
+#include <WifiErrorIcon.h>
+#include <BrokenLinkIcon.h>
 
 #define BAT_TEST_PIN 35
 GxEPD2_4G_4G<GxEPD2_213_GDEY0213B74, GxEPD2_213_GDEY0213B74::HEIGHT> display(GxEPD2_213_GDEY0213B74(/*CS=5*/ SS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4)); // GDEY0213B74 122x250, SSD1680, (FPC-A002 20.04.08)
+
+extern char username[50];
 
 uint16_t GetColor(int level)
 {
@@ -36,24 +39,30 @@ void initScreen() {
   display.fillRect(0, 0, display.width(), display.height(), GxEPD_BLACK);
 }
 
-void DrawHeader()
+void DrawHeader(bool isWifiError, bool isFetchError)
 {
   // Draw Github icon
   display.drawBitmap(7, 8, GithubIcon, 16, 16, GxEPD_WHITE);
 
   // Draw username
   display.setCursor(29, 13);
-  display.print("/HarryHighPants");
+  display.print("/" + String(username));
 
   // Draw battery percentage
-  display.setCursor(225, 13);
+  display.setCursor(display.width() - 25, 13);
   int adcValue = analogRead(BAT_TEST_PIN);
   float voltage = (adcValue / 4095.0) * 3.3 * 2;
   long percentage = map(voltage * 1000, 3200, 3900, 0, 100); // Use millivolts for mapping
   display.printf("%ld%%", percentage);
+
+  // Draw error icons
+  if (isWifiError || isFetchError)
+  {
+    display.drawBitmap(display.width() - 55, 8, isWifiError ? WifiErrorIcon : BrokenLinkIcon, 16, 16, GxEPD_WHITE);
+  }
 }
 
-void drawCommitGraph(JsonArray contributions)
+void drawCommitGraph(int contributions[], bool isWifiError, bool isFetchError)
 {
   initScreen();
 
@@ -68,7 +77,7 @@ void drawCommitGraph(JsonArray contributions)
   int yOffset = 24;
   int xOffset = 5;
 
-  DrawHeader();
+  DrawHeader(isWifiError, isFetchError);
 
   // Draw squares
   for (int column = 0; column < columns; column++)
@@ -78,14 +87,12 @@ void drawCommitGraph(JsonArray contributions)
       int squareX = column * gridSize + xOffset + squareMargin;
       int squareY = row * gridSize + yOffset + squareMargin;
       int index = rows * column + row;
-      int level = contributions[index].as<int>();
+      int level = contributions[index];
 
-      // Set a partial window for the specific square area
-      // display.setPartialWindow(squareX, squareY, squareSize, squareSize);
       display.fillRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level));
       display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GetColor(level + 1));
 
-      int isToday = level != -1 && (index == total - 1 || contributions[index + 1].as<int>() == -1);
+      int isToday = level != -1 && (index == total - 1 || contributions[index + 1] == -1);
       if (isToday)
       {
         display.drawRoundRect(squareX, squareY, squareSize, squareSize, borderThickness, GxEPD_WHITE);
@@ -99,21 +106,23 @@ void drawCommitGraph(JsonArray contributions)
 void drawConfigModeScreen(){
   initScreen();
   int margin = 25;
-  display.drawBitmap(display.width()-margin-32, margin, WifiIcon, 32,32, GxEPD_WHITE);
+  int lineHeight = 12;
+  display.drawBitmap(display.width()-margin-32, margin-5, WifiIcon, 32,32, GxEPD_WHITE);
 
   display.setTextSize(2);
-  display.setCursor(margin, margin);
+  display.setCursor(margin, margin+5);
   display.print("Config Mode");
 
   display.setTextSize(1);
-  display.setCursor(margin, margin + 30);
-  display.print("
-    Connect to my wifi\n
-    'Contributions Screen'\n\n
-
-    Then press 'sign in' to open\n
-    the browser configuration
-  ");
+  const int paragraphY = margin+40;
+  display.setCursor(margin, paragraphY);
+  display.print("Connect to my wifi");
+  display.setCursor(margin, paragraphY+lineHeight);
+  display.print("'Contributions Screen'");
+  display.setCursor(margin, paragraphY+lineHeight*3);
+  display.print("Then press 'sign in' to open");
+  display.setCursor(margin, paragraphY+lineHeight*4);
+  display.print("the browser configuration");
 
   // Draw the updates
   display.displayWindow(0, 0, display.width(), display.height());

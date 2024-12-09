@@ -8,14 +8,19 @@
 const int weeks = 17;
 
 // RTC memory
+RTC_DATA_ATTR bool hasInitialised = false;
 RTC_DATA_ATTR char username[50] = "HarryHighPants";
 RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID-2G";
 RTC_DATA_ATTR char wifiPassword[50] = "password";
 RTC_DATA_ATTR int syncInterval = 4; // Hours
 RTC_DATA_ATTR char apiUrl[100] = "https://contributions-api.harryab.com/";
-RTC_DATA_ATTR int lastContributions[weeks * 7];
+RTC_DATA_ATTR int lastContributions[weeks * 7] = {};
+RTC_DATA_ATTR bool showingWifiError = false;
+RTC_DATA_ATTR bool showingFetchError = false;
 
 String url = String(apiUrl) + String(username) + "?weeks=" + String(weeks);
+const int configModeTimeout = 20 * 60 * 1000; // 20 minutes
+unsigned long configStartMillis = 0;
 bool isConfigMode = false;
 
 void setup()
@@ -35,11 +40,7 @@ void setup()
       delay(2000);
       if (digitalRead(BUTTON_PIN) == LOW)
       {
-        Serial.println("Starting config server");
-        isConfigMode = true;
-        storeContributions(JsonArray());
-        drawConfigModeScreen();
-        startConfigServer();
+        enterConfigMode();
         return;
       }
     }
@@ -55,19 +56,27 @@ void setup()
   bool connected = TryConnectWifi();
   if (!connected)
   {
-    // TODO: show wifi error icon on screen
-    Serial.println("Failed to connect to wifi");
+    if(!showingWifiError){
+      Serial.println("Failed to connect to wifi");
+      showingWifiError = true;
+      drawCommitGraph(lastContributions, showingWifiError, showingFetchError);
+    }
     sleep();
   }
+  showingWifiError = false;
 
   JsonDocument doc;
   JsonArray contributions = FetchContributionsData(doc, url);
   if (contributions.size() == 0)
   {
-    // TODO: show json error icon on screen
-    Serial.println("Failed to fetch contributions data");
+    if(!showingFetchError){
+      Serial.println("Failed to fetch contributions data");
+      showingFetchError = true;
+      drawCommitGraph(lastContributions, showingWifiError, showingFetchError);
+    }
     sleep();
   }
+  showingFetchError = false;
 
   if (!haveContributionsChanged(contributions))
   {
@@ -76,13 +85,18 @@ void setup()
   }
 
   storeContributions(contributions);
-  drawCommitGraph(contributions);
+  drawCommitGraph(lastContributions, showingWifiError, showingFetchError);
   sleep();
 }
 
 void loop() {
-  if (!isConfigMode) return;
   delay(100);
+  if (!isConfigMode) return;
+  // Check if 20 minutes have passed
+  if (millis() - configStartMillis > configModeTimeout) {
+    Serial.println("Config mode timeout");
+    sleep();
+  }
   handleConfigClient();
 }
 
@@ -91,9 +105,21 @@ void sleep()
   // Set up GPIO39 as a wakeup source on LOW signal (when the button is pressed)
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, LOW);
 
-  Serial.println("Going to sleep for 1 hour");
-  esp_deep_sleep(3600e6); // 1 hour
+  Serial.println("Going to sleep for " + String(syncInterval) + " hours");
+  esp_deep_sleep(syncInterval * 3600e6); // 1 hour
   // esp_deep_sleep(10e6); // 10 seconds
+}
+
+void enterConfigMode()
+{
+  Serial.println("Starting config server");
+  isConfigMode = true;
+  memset(lastContributions, 0, sizeof(lastContributions));
+  showingWifiError = false;
+  showingFetchError = false;
+  drawConfigModeScreen();
+  startConfigServer();
+  configStartMillis = millis();
 }
 
 // Store the contributions in RTC memory

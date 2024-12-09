@@ -2,6 +2,7 @@
 #include <DNSServer.h>
 #include <WebServer.h>
 #include <ConfigHtml.h>
+#include <ConfigSavedHtml.h>
 
 const char* configSSID = "Contributions Screen";
 const char* configPassword = "HighPants";
@@ -21,6 +22,7 @@ void sendConfigHtml() {
   loadedConfigHtml.replace("{{wifi-ssid}}", wifiSSID);
   loadedConfigHtml.replace("{{wifi-password}}", wifiPassword);
   loadedConfigHtml.replace("{{interval}}", String(syncInterval));
+  loadedConfigHtml.replace("{{url}}", apiUrl);
   server.send(200, "text/html", loadedConfigHtml);
 }
 
@@ -31,8 +33,8 @@ void startConfigServer() {
   // By default DNSServer is started serving any "*" domain name. It will reply
   // AccessPoint's IP to all DNS request (this is required for Captive Portal detection)
   dnsServer.start();
+
   server.on("/", sendConfigHtml);
-  // Handle form submit
   server.on("/submit", []() {
     // Read the form values from the param and store them in RTC memory
     strcpy(username, server.arg("username").c_str());
@@ -40,14 +42,15 @@ void startConfigServer() {
     strcpy(wifiPassword, server.arg("wifi-password").c_str());
     syncInterval = server.arg("interval").toInt();
     strcpy(apiUrl, server.arg("url").c_str());
-    
-    sendConfigHtml();
+    server.send(200, "text/html", configSavedHtml);
+    // Restart with the updated config
+    esp_deep_sleep(1e6);
   });
   server.onNotFound(sendConfigHtml);
+
   server.begin();
 }
 
 void handleConfigClient() {
   server.handleClient();
-  delay(5);
 }
