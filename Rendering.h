@@ -3,7 +3,6 @@
 #include <GithubIcon.h>
 #include <WifiIcon.h>
 #include <Fonts/FreeMonoBold12pt7b.h>
-#include <Fonts/FreeSerifBold18pt7b.h>
 
 #define BAT_TEST_PIN 35
 GxEPD2_4G_4G<GxEPD2_213_GDEY0213B74, GxEPD2_213_GDEY0213B74::HEIGHT> display(GxEPD2_213_GDEY0213B74(/*CS=5*/ SS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4)); // GDEY0213B74 122x250, SSD1680, (FPC-A002 20.04.08)
@@ -30,7 +29,6 @@ uint16_t GetColor(int level)
 void initScreen() {
   display.init(115200);
   display.setRotation(1); // Landscape
-  display.setFont(&FreeMonoBold12pt7b);
   display.setTextColor(GxEPD_WHITE);
   display.setTextSize(1);
 
@@ -101,20 +99,21 @@ void drawCommitGraph(JsonArray contributions)
 void drawConfigModeScreen(){
   initScreen();
   int margin = 25;
-  display.drawBitmap(display.width()-margin-64, margin, WifiIcon, 32,32, GxEPD_WHITE);
+  display.drawBitmap(display.width()-margin-32, margin, WifiIcon, 32,32, GxEPD_WHITE);
 
-  display.setFont(&FreeSerifBold18pt7b);
   display.setTextSize(2);
   display.setCursor(margin, margin);
   display.print("Config Mode");
 
   display.setTextSize(1);
   display.setCursor(margin, margin + 30);
-  display.print("Connect to my wifi 'Contributions Screen'");
-  
-  display.setTextSize(1);
-  display.setCursor(margin, margin + 50);
-  display.print("Then press 'sign in' to open the browser configuration");
+  display.print("
+    Connect to my wifi\n
+    'Contributions Screen'\n\n
+
+    Then press 'sign in' to open\n
+    the browser configuration
+  ");
 
   // Draw the updates
   display.displayWindow(0, 0, display.width(), display.height());

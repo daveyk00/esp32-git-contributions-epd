@@ -8,29 +8,45 @@ const char* configPassword = "HighPants";
 DNSServer dnsServer;
 WebServer server(80);
 
+extern char username[50];
+extern char wifiSSID[50];
+extern char wifiPassword[50];
+extern int syncInterval; // Hours
+extern char apiUrl[100];
+
 void sendConfigHtml() {
-  server.send(200, "text/html", configHtml);
+  // Inject the stored values into the HTML
+  String loadedConfigHtml = String(configHtml);
+  loadedConfigHtml.replace("{{username}}", username);
+  loadedConfigHtml.replace("{{wifi-ssid}}", wifiSSID);
+  loadedConfigHtml.replace("{{wifi-password}}", wifiPassword);
+  loadedConfigHtml.replace("{{interval}}", String(syncInterval));
+  server.send(200, "text/html", loadedConfigHtml);
 }
 
-// Start the access point and the server
 void startConfigServer() {
   WiFi.mode(WIFI_AP);
   WiFi.softAP(configSSID, configPassword);
 
   // By default DNSServer is started serving any "*" domain name. It will reply
   // AccessPoint's IP to all DNS request (this is required for Captive Portal detection)
-  if (dnsServer.start()) {
-    Serial.println("Started DNS server in captive portal-mode");
-  } else {
-    Serial.println("Err: Can't start DNS server!");
-  }
-
+  dnsServer.start();
   server.on("/", sendConfigHtml);
+  // Handle form submit
+  server.on("/submit", []() {
+    // Read the form values from the param and store them in RTC memory
+    strcpy(username, server.arg("username").c_str());
+    strcpy(wifiSSID, server.arg("wifi-ssid").c_str());
+    strcpy(wifiPassword, server.arg("wifi-password").c_str());
+    syncInterval = server.arg("interval").toInt();
+    strcpy(apiUrl, server.arg("url").c_str());
+    
+    sendConfigHtml();
+  });
   server.onNotFound(sendConfigHtml);
   server.begin();
 }
 
-// Handle client connections
 void handleConfigClient() {
   server.handleClient();
   delay(5);

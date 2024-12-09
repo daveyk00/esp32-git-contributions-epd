@@ -5,16 +5,17 @@
 #include <ConfigAccessPoint.h>
 
 #define BUTTON_PIN 39 // GPIO39 (IO39) is the pin connected to the button
-
-WifiCredentials credentials[] = {
-    {"Hindsite Guest", "password"},
-    {"YourWifiSSID-2G", "password"},
-    {"Pixel_3588", "password"},
-};
-
 const int weeks = 17;
-String url = "https://contributions-api.harryab.com/harryhighpants?weeks=" + String(weeks);
+
+// RTC memory
+RTC_DATA_ATTR char username[50] = "HarryHighPants";
+RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID-2G";
+RTC_DATA_ATTR char wifiPassword[50] = "password";
+RTC_DATA_ATTR int syncInterval = 4; // Hours
+RTC_DATA_ATTR char apiUrl[100] = "https://contributions-api.harryab.com/";
 RTC_DATA_ATTR int lastContributions[weeks * 7];
+
+String url = String(apiUrl) + String(username) + "?weeks=" + String(weeks);
 bool isConfigMode = false;
 
 void setup()
@@ -42,7 +43,6 @@ void setup()
         return;
       }
     }
-
     break;
   case ESP_SLEEP_WAKEUP_TIMER: // Wakeup caused by the timer
     Serial.println("Wakeup caused by timer (deep sleep duration complete)");
@@ -52,7 +52,7 @@ void setup()
     break;
   }
 
-  bool connected = TryConnectWifi(credentials, sizeof(credentials) / sizeof(credentials[0]));
+  bool connected = TryConnectWifi();
   if (!connected)
   {
     // TODO: show wifi error icon on screen

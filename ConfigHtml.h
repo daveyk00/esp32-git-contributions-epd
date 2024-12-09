@@ -97,6 +97,7 @@ const char configHtml[] PROGMEM = R"rawliteral(
           <input
             style="padding-left: 25px"
             type="text"
+            value="{{username}}"
             name="username"
             placeholder="HarryHighPants"
             required
@@ -105,10 +106,17 @@ const char configHtml[] PROGMEM = R"rawliteral(
 
         <!-- WiFi Credentials -->
         <label for="wifi-ssid">Wifi SSID</label>
-        <input type="text" name="wifi-ssid" placeholder="WiFi SSID" required />
+        <input
+          type="text"
+          value="{{wifi-ssid}}"
+          name="wifi-ssid"
+          placeholder="WiFi SSID"
+          required
+        />
         <label for="wifi-password">Wifi Password</label>
         <input
           type="password"
+          value="{{wifi-password}}"
           name="wifi-password"
           placeholder="Password"
           required
@@ -118,6 +126,7 @@ const char configHtml[] PROGMEM = R"rawliteral(
         <label for="interval">Sync interval (Hours)</label>
         <input
           type="number"
+          value="{{interval}}"
           name="interval"
           placeholder="4"
           value="4"

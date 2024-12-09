@@ -4,43 +4,28 @@
 #include <HTTPClient.h>
 #include <StreamUtils.h>
 
-struct WifiCredentials
-{
-    const char *ssid;
-    const char *password;
-};
-
-// Store the last valid credentials in RTC memory
-RTC_DATA_ATTR int lastConnectedIndex = -1;
+extern char wifiSSID[50];
+extern char wifiPassword[50];
 
 // Try to connect to wifi using a list of credentials
-bool TryConnectWifi(WifiCredentials credentials[], int numCredentials)
+bool TryConnectWifi()
 {
     const unsigned long timeout = 6000; // 6 seconds timeout
-    for (int i = -1; i < numCredentials; i++)
+    WiFi.begin(wifiSSID, wifiPassword);
+    Serial.print("\nConnecting to Wifi: ");
+    unsigned long startAttemptTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout)
     {
-        if (i == lastConnectedIndex)
-            continue;
-        const int credentialIndex = i == -1 ? lastConnectedIndex : i;
-
-        WiFi.begin(credentials[credentialIndex].ssid, credentials[credentialIndex].password);
-        Serial.print("\nConnecting to Wifi: ");
-        Serial.println(credentials[credentialIndex].ssid);
-        unsigned long startAttemptTime = millis();
-        while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout)
-        {
-            delay(500);
-            Serial.print(".");
-        }
-
-        if (WiFi.status() == WL_CONNECTED)
-        {
-            Serial.println("\nWiFi connected");
-            lastConnectedIndex = credentialIndex;
-            return true;
-        }
+        delay(500);
+        Serial.print(".");
     }
-    Serial.println("\nAll WiFi connection attempts failed");
+
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        Serial.println("\nWiFi connected");
+        return true;
+    }
+    Serial.println("\nWiFi connection failed");
     return false;
 }
 
