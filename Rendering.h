@@ -4,6 +4,7 @@
 #include <WifiIcon.h>
 #include <WifiErrorIcon.h>
 #include <BrokenLinkIcon.h>
+#include <muMatrix8ptRegular.h>
 
 #define BAT_TEST_PIN 35
 GxEPD2_4G_4G<GxEPD2_213_GDEY0213B74, GxEPD2_213_GDEY0213B74::HEIGHT> display(GxEPD2_213_GDEY0213B74(/*CS=5*/ SS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4)); // GDEY0213B74 122x250, SSD1680, (FPC-A002 20.04.08)
@@ -33,6 +34,7 @@ void initScreen() {
   display.init(115200);
   display.setRotation(1); // Landscape
   display.setTextColor(GxEPD_WHITE);
+  display.setFont(&muMatrix8ptRegular);
   display.setTextSize(1);
 
   // Set black background
@@ -45,11 +47,11 @@ void DrawHeader(bool isWifiError, bool isFetchError)
   display.drawBitmap(7, 8, GithubIcon, 16, 16, GxEPD_WHITE);
 
   // Draw username
-  display.setCursor(29, 13);
+  display.setCursor(29, 20);
   display.print("/" + String(username));
 
   // Draw battery percentage
-  display.setCursor(display.width() - 25, 13);
+  display.setCursor(display.width() - 25, 20);
   int adcValue = analogRead(BAT_TEST_PIN);
   float voltage = (adcValue / 4095.0) * 3.3 * 2;
   long percentage = map(voltage * 1000, 3200, 3900, 0, 100); // Use millivolts for mapping
@@ -107,14 +109,14 @@ void drawConfigModeScreen(){
   initScreen();
   int margin = 25;
   int lineHeight = 12;
-  display.drawBitmap(display.width()-margin-32, margin-5, WifiIcon, 32,32, GxEPD_WHITE);
+  display.drawBitmap(display.width()-margin-32, margin-8, WifiIcon, 32,32, GxEPD_WHITE);
 
   display.setTextSize(2);
-  display.setCursor(margin, margin+5);
+  display.setCursor(margin, margin+14);
   display.print("Config Mode");
 
   display.setTextSize(1);
-  const int paragraphY = margin+40;
+  const int paragraphY = margin+36;
   display.setCursor(margin, paragraphY);
   display.print("Connect to my wifi");
   display.setCursor(margin, paragraphY+lineHeight);

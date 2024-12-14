@@ -35,6 +35,7 @@ JsonArray FetchContributionsData(JsonDocument &doc, String url)
     HTTPClient http;
     client.setInsecure();
 
+    Serial.println("Fetching contributions data from: " + url);
     http.begin(client, url);
     int httpCode = http.GET();
     Serial.printf("\nHTTP Response code: %d\n", httpCode);
