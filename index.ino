@@ -14,6 +14,7 @@ RTC_DATA_ATTR char username[50] = "HarryHighPants";
 RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID-2G";
 RTC_DATA_ATTR char wifiPassword[50] = "password";
 RTC_DATA_ATTR int syncInterval = 4; // Hours
+RTC_DATA_ATTR bool darkMode = false;
 RTC_DATA_ATTR char apiUrl[100] = "https://contributions-api.harryab.com/";
 RTC_DATA_ATTR int lastContributions[totalDays] = {};
 RTC_DATA_ATTR bool showingWifiError = false;
