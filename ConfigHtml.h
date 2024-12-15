@@ -133,6 +133,12 @@ const char configHtml[] PROGMEM = R"rawliteral(
           required
         />
 
+        <!-- Dark Mode -->
+        <div style="margin-top: 15px">
+          <label for="dark-mode">Dark Mode</label>
+          <input type="checkbox" name="dark-mode" {{dark-mode}} />
+        </div>
+
         <!-- API URL -->
         <label for="interval">API url override (optional)</label>
         <input

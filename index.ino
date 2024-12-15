@@ -136,6 +136,7 @@ void enterConfigMode()
   drawConfigModeScreen();
   startConfigServer();
   configStartMillis = millis();
+  memset(lastContributions, 0, sizeof(lastContributions));
 }
 
 // Store the contributions in RTC memory
