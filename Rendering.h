@@ -112,10 +112,12 @@ void drawConfigModeScreen(){
   int lineHeight = 12;
   display.drawBitmap(display.width()-margin-32, margin-8, WifiIcon, 32,32, GetColor(4));
 
+  // Title
   display.setTextSize(2);
   display.setCursor(margin, margin+14);
   display.print("Config Mode");
 
+  // Details
   display.setTextSize(1);
   const int paragraphY = margin+36;
   display.setCursor(margin, paragraphY);

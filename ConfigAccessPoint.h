@@ -5,7 +5,6 @@
 #include <ConfigSavedHtml.h>
 
 const char* configSSID = "Contributions Screen";
-const char* configPassword = "HighPants";
 DNSServer dnsServer;
 WebServer server(80);
 extern const int totalDays;
@@ -31,7 +30,7 @@ void sendConfigHtml() {
 
 void startConfigServer() {
   WiFi.mode(WIFI_AP);
-  WiFi.softAP(configSSID, configPassword);
+  WiFi.softAP(configSSID);
 
   // By default DNSServer is started serving any "*" domain name. It will reply
   // AccessPoint's IP to all DNS request (this is required for Captive Portal detection)
