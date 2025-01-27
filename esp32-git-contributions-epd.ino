@@ -4,18 +4,17 @@
 #include <ContribData.h>
 #include <ConfigAccessPoint.h>
 
-#define BUTTON_PIN 39 // GPIO39 (IO39) is the pin connected to the button
+#define BUTTON_PIN 39 // GPIO39 (IO39)
 const int weeks = 17;
-const int totalDays = weeks*7;
 
-// RTC memory
+// RTC memory - Clears when the device is powered off
 RTC_DATA_ATTR char username[50] = "HarryHighPants";
-RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID-2G";
-RTC_DATA_ATTR char wifiPassword[50] = "password";
+RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID";
+RTC_DATA_ATTR char wifiPassword[50] = "";
 RTC_DATA_ATTR int syncInterval = 4; // Hours
 RTC_DATA_ATTR bool darkMode = false;
 RTC_DATA_ATTR char apiUrl[100] = "https://contributions-api.harryab.com/";
-RTC_DATA_ATTR int lastContributions[totalDays] = {};
+RTC_DATA_ATTR int lastContributions[weeks*7] = {};
 RTC_DATA_ATTR bool showingWifiError = false;
 RTC_DATA_ATTR bool showingFetchError = false;
 
@@ -107,8 +106,7 @@ void sleep()
   esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_PIN, LOW);
 
   Serial.println("Going to sleep for " + String(syncInterval) + " hours");
-  esp_deep_sleep(syncInterval * 3600e6); // 1 hour
-  // esp_deep_sleep(10e6); // 10 seconds
+  esp_deep_sleep(syncInterval * 3600e6); // syncInterval * 1 hour
 }
 
 bool isHoldingButton()
