@@ -105,7 +105,7 @@ const char configHtml[] PROGMEM = R"rawliteral(
         </div>
 
         <!-- WiFi Credentials -->
-        <label for="wifi-ssid">Wifi SSID (2.4Ghz only)</label>
+        <label for="wifi-ssid">Wifi SSID (2.4Ghz only, case sensitive)</label>
         <input
           type="text"
           value="{{wifi-ssid}}"

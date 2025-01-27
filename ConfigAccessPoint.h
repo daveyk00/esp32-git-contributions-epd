@@ -1,13 +1,12 @@
 
 #include <DNSServer.h>
 #include <WebServer.h>
-#include <ConfigHtml.h>
-#include <ConfigSavedHtml.h>
+#include <captivePortalHtml/ConfigHtml.h>
+#include <captivePortalHtml/ConfigSavedHtml.h>
 
 const char* configSSID = "Contributions Screen";
 DNSServer dnsServer;
 WebServer server(80);
-extern const int totalDays;
 
 extern char username[50];
 extern char wifiSSID[50];
