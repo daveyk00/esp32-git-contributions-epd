@@ -9,7 +9,6 @@ const int weeks = 17;
 const int totalDays = weeks*7;
 
 // RTC memory
-RTC_DATA_ATTR bool hasInitialised = false;
 RTC_DATA_ATTR char username[50] = "HarryHighPants";
 RTC_DATA_ATTR char wifiSSID[50] = "YourWifiSSID-2G";
 RTC_DATA_ATTR char wifiPassword[50] = "password";
