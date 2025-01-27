@@ -1,10 +1,10 @@
 #include <ArduinoJson.h>
 #include <GxEPD2_4G_4G.h>
-#include <GithubIcon.h>
-#include <WifiIcon.h>
-#include <WifiErrorIcon.h>
-#include <BrokenLinkIcon.h>
-#include <muMatrix8ptRegular.h>
+#include <assets/GithubIcon.h>
+#include <assets/WifiIcon.h>
+#include <assets/WifiErrorIcon.h>
+#include <assets/BrokenLinkIcon.h>
+#include <assets/muMatrix8ptRegular.h>
 
 #define BAT_TEST_PIN 35
 GxEPD2_4G_4G<GxEPD2_213_GDEY0213B74, GxEPD2_213_GDEY0213B74::HEIGHT> display(GxEPD2_213_GDEY0213B74(/*CS=5*/ SS, /*DC=*/17, /*RST=*/16, /*BUSY=*/4)); // GDEY0213B74 122x250, SSD1680, (FPC-A002 20.04.08)
@@ -69,7 +69,6 @@ void drawCommitGraph(int contributions[], bool isWifiError, bool isFetchError)
 {
   initScreen();
 
-  // GxEPD_WHITE, GxEPD_LIGHTGREY, GxEPD_DARKGREY, GxEPD_BLACK
   int columns = 17;
   int rows = 7;
   int total = columns * rows;
