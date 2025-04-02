@@ -20,7 +20,7 @@ Runs for ~3 months before needing a recharge via micro usb. Default refresh inte
 ## Configuration
 
 Hold down the button for 2 seconds to go into wifi configuration mode. This will create a wifi network called "Contributions screen"
-<img src="showcase/config_mode.jpg"  />
+<img src="showcase/config_mode.jpg" width="49%" />
 
 Once connected with your phone or laptop press "Sign In" to open the browser configuration
 
