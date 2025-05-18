@@ -47,11 +47,9 @@ After saving your configuration the device will restart with the updated setting
   - 50mm x 34mm x 6mm
   - Great size for this project, fits quite snugly. A thinner battery might need something to prevent rattling around like some double sided tape
   - The Lilygo comes with a 1.25mm 2pin JST connector so don't need to worry about finding one with that connector
-- 3d printed case and stand
+- 3d printed case and stand available for free on [MakerWorld](https://makerworld.com/en/models/1427537-lilygo-t5-2-13-3d-printed-case#profileId-1483837)
 
-  - Case features:
-    - Buttons and switch, secured lid with screws, thin screen bezels and a mechanism to keep the screen firmly at the front of the case.
-  - Available for purchase via [Ko-Fi](https://ko-fi.com/s/6b5f09b34c) store
+  - Buttons and switch, secured lid with screws, thin screen bezels and a mechanism to keep the screen firmly at the front of the case.
   - For the wood style finish I printed with a Bambu Lab wood filament and applied an alcohol ink with a cheap and thick paintbrush
   - Other cases available:
     - Thingiverse model by [xl0e](https://www.thingiverse.com/thing:4670205)
@@ -62,6 +60,9 @@ After saving your configuration the device will restart with the updated setting
 - M3 female thread inserts ~5.7mm
   - These are great, just push them into 3d prints with a soldering iron and you've got a perfect thread
 - AWG 26-24 Heat shrink wire connectors or solder
+
+The EleksCava creator has had success adapting the code to work with their screen [here](https://www.reddit.com/r/esp32/comments/1kgrwxk/comment/mrbv0fa)
+<img src="showcase/elekscava.jpg" width="100%" />
 
 ## Software
 
