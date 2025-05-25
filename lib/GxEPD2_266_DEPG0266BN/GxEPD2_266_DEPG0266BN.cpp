@@ -3,10 +3,9 @@
 #include <Arduino.h>
 #include <GxEPD2_4G_EPD.h>
 
-GxEPD2_266_DEPG0266BN::GxEPD2_266_DEPG0266BN(int16_t cs, int16_t dc,
-                                             int16_t rst, int16_t busy)
-    : GxEPD2_4G_EPD(cs, dc, rst, busy, HIGH, 10000000, WIDTH, HEIGHT, panel,
-                    hasColor, hasPartialUpdate, hasFastPartialUpdate) {
+GxEPD2_266_DEPG0266BN::GxEPD2_266_DEPG0266BN(int16_t cs, int16_t dc, int16_t rst, int16_t busy)
+    : GxEPD2_4G_EPD(cs, dc, rst, busy, HIGH, 10000000, WIDTH, HEIGHT, panel, hasColor, hasPartialUpdate,
+                    hasFastPartialUpdate) {
   _refresh_mode = full_refresh;
 }
 
@@ -46,9 +45,7 @@ void GxEPD2_266_DEPG0266BN::_writeScreenBuffer(uint8_t command, uint8_t value) {
   _endTransfer();
 }
 
-void GxEPD2_266_DEPG0266BN::_writeScreenBufferArea(uint8_t command,
-                                                   uint8_t value, uint16_t x,
-                                                   uint16_t y, uint16_t w,
+void GxEPD2_266_DEPG0266BN::_writeScreenBufferArea(uint8_t command, uint8_t value, uint16_t x, uint16_t y, uint16_t w,
                                                    uint16_t h) {
   _setPartialRamArea(x, y, w, h);
   _writeCommand(command);
@@ -59,41 +56,32 @@ void GxEPD2_266_DEPG0266BN::_writeScreenBufferArea(uint8_t command,
   _endTransfer();
 }
 
-void GxEPD2_266_DEPG0266BN::writeImage(const uint8_t bitmap[], int16_t x,
-                                       int16_t y, int16_t w, int16_t h,
-                                       bool invert, bool mirror_y, bool pgm) {
-  if (_refresh_mode == grey_refresh)
-    _writeImage(0x26, bitmap, x, y, w, h, invert, mirror_y, pgm);
+void GxEPD2_266_DEPG0266BN::writeImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert,
+                                       bool mirror_y, bool pgm) {
+  if (_refresh_mode == grey_refresh) _writeImage(0x26, bitmap, x, y, w, h, invert, mirror_y, pgm);
   _writeImage(0x24, bitmap, x, y, w, h, invert, mirror_y, pgm);
 }
 
-void GxEPD2_266_DEPG0266BN::writeImageForFullRefresh(const uint8_t bitmap[],
-                                                     int16_t x, int16_t y,
-                                                     int16_t w, int16_t h,
-                                                     bool invert, bool mirror_y,
-                                                     bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImageForFullRefresh(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h,
+                                                     bool invert, bool mirror_y, bool pgm) {
   _writeImage(0x26, bitmap, x, y, w, h, invert, mirror_y, pgm);  // set previous
   _writeImage(0x24, bitmap, x, y, w, h, invert, mirror_y, pgm);  // set current
 }
 
-void GxEPD2_266_DEPG0266BN::writeImageAgain(const uint8_t bitmap[], int16_t x,
-                                            int16_t y, int16_t w, int16_t h,
-                                            bool invert, bool mirror_y,
-                                            bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImageAgain(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h,
+                                            bool invert, bool mirror_y, bool pgm) {
   _writeImage(0x26, bitmap, x, y, w, h, invert, mirror_y, pgm);  // set previous
   _writeImage(0x24, bitmap, x, y, w, h, invert, mirror_y, pgm);  // set current
 }
 
-void GxEPD2_266_DEPG0266BN::_writeImage(uint8_t command, const uint8_t bitmap[],
-                                        int16_t x, int16_t y, int16_t w,
-                                        int16_t h, bool invert, bool mirror_y,
-                                        bool pgm) {
-  delay(1);                    // yield() to avoid WDT on ESP8266 and ESP32
-  int16_t wb = (w + 7) / 8;    // width bytes, bitmaps are padded
-  x -= x % 8;                  // byte boundary
-  w = wb * 8;                  // byte boundary
-  int16_t x1 = x < 0 ? 0 : x;  // limit
-  int16_t y1 = y < 0 ? 0 : y;  // limit
+void GxEPD2_266_DEPG0266BN::_writeImage(uint8_t command, const uint8_t bitmap[], int16_t x, int16_t y, int16_t w,
+                                        int16_t h, bool invert, bool mirror_y, bool pgm) {
+  delay(1);                                                         // yield() to avoid WDT on ESP8266 and ESP32
+  int16_t wb = (w + 7) / 8;                                         // width bytes, bitmaps are padded
+  x -= x % 8;                                                       // byte boundary
+  w = wb * 8;                                                       // byte boundary
+  int16_t x1 = x < 0 ? 0 : x;                                       // limit
+  int16_t y1 = y < 0 ? 0 : y;                                       // limit
   uint16_t w1 = x + w < int16_t(WIDTH) ? w : int16_t(WIDTH) - x;    // limit
   uint16_t h1 = y + h < int16_t(HEIGHT) ? h : int16_t(HEIGHT) - y;  // limit
   int16_t dx = x1 - x;
@@ -110,8 +98,7 @@ void GxEPD2_266_DEPG0266BN::_writeImage(uint8_t command, const uint8_t bitmap[],
     for (uint16_t j = 0; j < w1 / 8; j++) {
       uint8_t data;
       // use wb, h of bitmap for index!
-      int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * wb
-                             : j + dx / 8 + (i + dy) * wb;
+      int16_t idx = mirror_y ? j + dx / 8 + ((h - 1 - (i + dy))) * wb : j + dx / 8 + (i + dy) * wb;
       if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
         data = pgm_read_byte(&bitmap[idx]);
@@ -129,22 +116,19 @@ void GxEPD2_266_DEPG0266BN::_writeImage(uint8_t command, const uint8_t bitmap[],
   delay(1);  // yield() to avoid WDT on ESP8266 and ESP32
 }
 
-void GxEPD2_266_DEPG0266BN::writeImage_4G(const uint8_t bitmap[], uint8_t bpp,
-                                          int16_t x, int16_t y, int16_t w,
-                                          int16_t h, bool invert, bool mirror_y,
-                                          bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImage_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x, int16_t y, int16_t w,
+                                          int16_t h, bool invert, bool mirror_y, bool pgm) {
   uint16_t ppb = (bpp == 2 ? 4 : (bpp == 4 ? 2 : (bpp == 8 ? 1 : 0)));
   uint8_t mask = (bpp == 2 ? 0xC0 : (bpp == 4 ? 0xF0 : 0xFF));
   uint8_t grey1 = (bpp == 2 ? 0x80 : 0xA0);  // demo limit for 4bpp
   if (ppb == 0) return;
-  delay(1);                   // yield() to avoid WDT on ESP8266 and ESP32
-  int16_t wbc = (w + 7) / 8;  // width bytes on controller
-  x -= x % 8;                 // byte boundary on controller
-  w = wbc * 8;                // byte boundary on controller
-  int16_t wb =
-      (w + ppb - 1) / ppb;     // width bytes of bitmap, bitmaps are padded
-  int16_t x1 = x < 0 ? 0 : x;  // limit
-  int16_t y1 = y < 0 ? 0 : y;  // limit
+  delay(1);                                                         // yield() to avoid WDT on ESP8266 and ESP32
+  int16_t wbc = (w + 7) / 8;                                        // width bytes on controller
+  x -= x % 8;                                                       // byte boundary on controller
+  w = wbc * 8;                                                      // byte boundary on controller
+  int16_t wb = (w + ppb - 1) / ppb;                                 // width bytes of bitmap, bitmaps are padded
+  int16_t x1 = x < 0 ? 0 : x;                                       // limit
+  int16_t y1 = y < 0 ? 0 : y;                                       // limit
   uint16_t w1 = x + w < int16_t(WIDTH) ? w : int16_t(WIDTH) - x;    // limit
   uint16_t h1 = y + h < int16_t(HEIGHT) ? h : int16_t(HEIGHT) - y;  // limit
   int16_t dx = x1 - x;
@@ -166,8 +150,7 @@ void GxEPD2_266_DEPG0266BN::writeImage_4G(const uint8_t bitmap[], uint8_t bpp,
         uint8_t in_byte;
         // use wb, h of bitmap for index!
         uint32_t idx =
-            mirror_y ? j + k + dx / ppb + uint32_t((h - 1 - (i + dy))) * wb
-                     : j + k + dx / ppb + uint32_t(i + dy) * wb;
+            mirror_y ? j + k + dx / ppb + uint32_t((h - 1 - (i + dy))) * wb : j + k + dx / ppb + uint32_t(i + dy) * wb;
         if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
           in_byte = pgm_read_byte(&bitmap[idx]);
@@ -209,8 +192,7 @@ void GxEPD2_266_DEPG0266BN::writeImage_4G(const uint8_t bitmap[], uint8_t bpp,
         uint8_t in_byte;
         // use wb, h of bitmap for index!
         uint32_t idx =
-            mirror_y ? j + k + dx / ppb + uint32_t((h - 1 - (i + dy))) * wb
-                     : j + k + dx / ppb + uint32_t(i + dy) * wb;
+            mirror_y ? j + k + dx / ppb + uint32_t((h - 1 - (i + dy))) * wb : j + k + dx / ppb + uint32_t(i + dy) * wb;
         if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
           in_byte = pgm_read_byte(&bitmap[idx]);
@@ -243,45 +225,36 @@ void GxEPD2_266_DEPG0266BN::writeImage_4G(const uint8_t bitmap[], uint8_t bpp,
   delay(1);  // yield() to avoid WDT on ESP8266 and ESP32
 }
 
-void GxEPD2_266_DEPG0266BN::writeImagePart(const uint8_t bitmap[],
-                                           int16_t x_part, int16_t y_part,
-                                           int16_t w_bitmap, int16_t h_bitmap,
-                                           int16_t x, int16_t y, int16_t w,
-                                           int16_t h, bool invert,
+void GxEPD2_266_DEPG0266BN::writeImagePart(const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap,
+                                           int16_t h_bitmap, int16_t x, int16_t y, int16_t w, int16_t h, bool invert,
                                            bool mirror_y, bool pgm) {
   if (_refresh_mode == grey_refresh)
-    _writeImagePart(0x26, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w,
-                    h, invert, mirror_y, pgm);
-  _writeImagePart(0x24, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                  invert, mirror_y, pgm);
+    _writeImagePart(0x26, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
+  _writeImagePart(0x24, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
 }
 
-void GxEPD2_266_DEPG0266BN::writeImagePartAgain(
-    const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap,
-    int16_t h_bitmap, int16_t x, int16_t y, int16_t w, int16_t h, bool invert,
-    bool mirror_y, bool pgm) {
-  _writeImagePart(0x24, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                  invert, mirror_y, pgm);
-  _writeImagePart(0x26, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                  invert, mirror_y, pgm);
+void GxEPD2_266_DEPG0266BN::writeImagePartAgain(const uint8_t bitmap[], int16_t x_part, int16_t y_part,
+                                                int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                                int16_t h, bool invert, bool mirror_y, bool pgm) {
+  _writeImagePart(0x24, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
+  _writeImagePart(0x26, bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
 }
 
-void GxEPD2_266_DEPG0266BN::_writeImagePart(
-    uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part,
-    int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
-    int16_t h, bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::_writeImagePart(uint8_t command, const uint8_t bitmap[], int16_t x_part, int16_t y_part,
+                                            int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                            int16_t h, bool invert, bool mirror_y, bool pgm) {
   delay(1);  // yield() to avoid WDT on ESP8266 and ESP32
   if ((w_bitmap < 0) || (h_bitmap < 0) || (w < 0) || (h < 0)) return;
   if ((x_part < 0) || (x_part >= w_bitmap)) return;
   if ((y_part < 0) || (y_part >= h_bitmap)) return;
-  int16_t wb_bitmap = (w_bitmap + 7) / 8;  // width bytes, bitmaps are padded
-  x_part -= x_part % 8;                    // byte boundary
-  w = w_bitmap - x_part < w ? w_bitmap - x_part : w;  // limit
-  h = h_bitmap - y_part < h ? h_bitmap - y_part : h;  // limit
-  x -= x % 8;                                         // byte boundary
-  w = 8 * ((w + 7) / 8);       // byte boundary, bitmaps are padded
-  int16_t x1 = x < 0 ? 0 : x;  // limit
-  int16_t y1 = y < 0 ? 0 : y;  // limit
+  int16_t wb_bitmap = (w_bitmap + 7) / 8;                           // width bytes, bitmaps are padded
+  x_part -= x_part % 8;                                             // byte boundary
+  w = w_bitmap - x_part < w ? w_bitmap - x_part : w;                // limit
+  h = h_bitmap - y_part < h ? h_bitmap - y_part : h;                // limit
+  x -= x % 8;                                                       // byte boundary
+  w = 8 * ((w + 7) / 8);                                            // byte boundary, bitmaps are padded
+  int16_t x1 = x < 0 ? 0 : x;                                       // limit
+  int16_t y1 = y < 0 ? 0 : y;                                       // limit
   uint16_t w1 = x + w < int16_t(WIDTH) ? w : int16_t(WIDTH) - x;    // limit
   uint16_t h1 = y + h < int16_t(HEIGHT) ? h : int16_t(HEIGHT) - y;  // limit
   int16_t dx = x1 - x;
@@ -301,10 +274,8 @@ void GxEPD2_266_DEPG0266BN::_writeImagePart(
     for (uint16_t j = 0; j < w1 / 8; j++) {
       uint8_t data;
       // use wb_bitmap, h_bitmap of bitmap for index!
-      int16_t idx =
-          mirror_y ? x_part / 8 + j + dx / 8 +
-                         ((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
-                   : x_part / 8 + j + dx / 8 + (y_part + i + dy) * wb_bitmap;
+      int16_t idx = mirror_y ? x_part / 8 + j + dx / 8 + ((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
+                             : x_part / 8 + j + dx / 8 + (y_part + i + dy) * wb_bitmap;
       if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
         data = pgm_read_byte(&bitmap[idx]);
@@ -322,10 +293,9 @@ void GxEPD2_266_DEPG0266BN::_writeImagePart(
   delay(1);  // yield() to avoid WDT on ESP8266 and ESP32
 }
 
-void GxEPD2_266_DEPG0266BN::writeImagePart_4G(
-    const uint8_t bitmap[], uint8_t bpp, int16_t x_part, int16_t y_part,
-    int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
-    int16_t h, bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImagePart_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x_part, int16_t y_part,
+                                              int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                              int16_t h, bool invert, bool mirror_y, bool pgm) {
   uint16_t ppb = (bpp == 2 ? 4 : (bpp == 4 ? 2 : (bpp == 8 ? 1 : 0)));
   uint8_t mask = (bpp == 2 ? 0xC0 : (bpp == 4 ? 0xF0 : 0xFF));
   uint8_t grey1 = (bpp == 2 ? 0x80 : 0xA0);  // demo limit for 4bpp
@@ -334,15 +304,14 @@ void GxEPD2_266_DEPG0266BN::writeImagePart_4G(
   if ((w_bitmap < 0) || (h_bitmap < 0) || (w < 0) || (h < 0)) return;
   if ((x_part < 0) || (x_part >= w_bitmap)) return;
   if ((y_part < 0) || (y_part >= h_bitmap)) return;
-  int16_t wb_bitmap =
-      (w_bitmap + ppb - 1) / ppb;  // width bytes, bitmaps are padded
-  x_part -= x_part % ppb;          // byte boundary
-  w = w_bitmap - x_part < w ? w_bitmap - x_part : w;  // limit
-  h = h_bitmap - y_part < h ? h_bitmap - y_part : h;  // limit
-  x -= x % ppb;                                       // byte boundary
-  w = ppb * ((w + ppb - 1) / ppb);  // byte boundary, bitmaps are padded
-  int16_t x1 = x < 0 ? 0 : x;       // limit
-  int16_t y1 = y < 0 ? 0 : y;       // limit
+  int16_t wb_bitmap = (w_bitmap + ppb - 1) / ppb;                   // width bytes, bitmaps are padded
+  x_part -= x_part % ppb;                                           // byte boundary
+  w = w_bitmap - x_part < w ? w_bitmap - x_part : w;                // limit
+  h = h_bitmap - y_part < h ? h_bitmap - y_part : h;                // limit
+  x -= x % ppb;                                                     // byte boundary
+  w = ppb * ((w + ppb - 1) / ppb);                                  // byte boundary, bitmaps are padded
+  int16_t x1 = x < 0 ? 0 : x;                                       // limit
+  int16_t y1 = y < 0 ? 0 : y;                                       // limit
   uint16_t w1 = x + w < int16_t(WIDTH) ? w : int16_t(WIDTH) - x;    // limit
   uint16_t h1 = y + h < int16_t(HEIGHT) ? h : int16_t(HEIGHT) - y;  // limit
   int16_t dx = x1 - x;
@@ -363,12 +332,9 @@ void GxEPD2_266_DEPG0266BN::writeImagePart_4G(
       {
         uint8_t in_byte;
         // use wb_bitmap, h_bitmap of bitmap for index!
-        uint32_t idx =
-            mirror_y
-                ? x_part / ppb + j + k + dx / ppb +
-                      uint32_t((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
-                : x_part / ppb + j + k + dx / ppb +
-                      uint32_t(y_part + i + dy) * wb_bitmap;
+        uint32_t idx = mirror_y
+                           ? x_part / ppb + j + k + dx / ppb + uint32_t((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
+                           : x_part / ppb + j + k + dx / ppb + uint32_t(y_part + i + dy) * wb_bitmap;
         if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
           in_byte = pgm_read_byte(&bitmap[idx]);
@@ -409,12 +375,9 @@ void GxEPD2_266_DEPG0266BN::writeImagePart_4G(
       {
         uint8_t in_byte;
         // use wb_bitmap, h_bitmap of bitmap for index!
-        uint32_t idx =
-            mirror_y
-                ? x_part / ppb + j + k + dx / ppb +
-                      uint32_t((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
-                : x_part / ppb + j + k + dx / ppb +
-                      uint32_t(y_part + i + dy) * wb_bitmap;
+        uint32_t idx = mirror_y
+                           ? x_part / ppb + j + k + dx / ppb + uint32_t((h_bitmap - 1 - (y_part + i + dy))) * wb_bitmap
+                           : x_part / ppb + j + k + dx / ppb + uint32_t(y_part + i + dy) * wb_bitmap;
         if (pgm) {
 #if defined(__AVR) || defined(ESP8266) || defined(ESP32)
           in_byte = pgm_read_byte(&bitmap[idx]);
@@ -447,95 +410,73 @@ void GxEPD2_266_DEPG0266BN::writeImagePart_4G(
   delay(1);  // yield() to avoid WDT on ESP8266 and ESP32
 }
 
-void GxEPD2_266_DEPG0266BN::writeImage(const uint8_t* black,
-                                       const uint8_t* color, int16_t x,
-                                       int16_t y, int16_t w, int16_t h,
-                                       bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImage(const uint8_t* black, const uint8_t* color, int16_t x, int16_t y, int16_t w,
+                                       int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (black) {
     writeImage(black, x, y, w, h, invert, mirror_y, pgm);
   }
 }
 
-void GxEPD2_266_DEPG0266BN::writeImagePart(
-    const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part,
-    int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
-    int16_t h, bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeImagePart(const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part,
+                                           int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                           int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (black) {
-    writeImagePart(black, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                   invert, mirror_y, pgm);
+    writeImagePart(black, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
   }
 }
 
-void GxEPD2_266_DEPG0266BN::writeNative(const uint8_t* data1,
-                                        const uint8_t* data2, int16_t x,
-                                        int16_t y, int16_t w, int16_t h,
-                                        bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::writeNative(const uint8_t* data1, const uint8_t* data2, int16_t x, int16_t y, int16_t w,
+                                        int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (data1) {
     writeImage(data1, x, y, w, h, invert, mirror_y, pgm);
   }
 }
 
-void GxEPD2_266_DEPG0266BN::drawImage(const uint8_t bitmap[], int16_t x,
-                                      int16_t y, int16_t w, int16_t h,
-                                      bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::drawImage(const uint8_t bitmap[], int16_t x, int16_t y, int16_t w, int16_t h, bool invert,
+                                      bool mirror_y, bool pgm) {
   writeImage(bitmap, x, y, w, h, invert, mirror_y, pgm);
   refresh(x, y, w, h);
   writeImageAgain(bitmap, x, y, w, h, invert, mirror_y, pgm);
 }
 
-void GxEPD2_266_DEPG0266BN::drawImage_4G(const uint8_t bitmap[], uint8_t bpp,
-                                         int16_t x, int16_t y, int16_t w,
-                                         int16_t h, bool invert, bool mirror_y,
-                                         bool pgm) {
+void GxEPD2_266_DEPG0266BN::drawImage_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x, int16_t y, int16_t w,
+                                         int16_t h, bool invert, bool mirror_y, bool pgm) {
   writeImage_4G(bitmap, bpp, x, y, w, h, invert, mirror_y, pgm);
   refresh(x, y, w, h);
 }
 
-void GxEPD2_266_DEPG0266BN::drawImagePart(const uint8_t bitmap[],
-                                          int16_t x_part, int16_t y_part,
-                                          int16_t w_bitmap, int16_t h_bitmap,
-                                          int16_t x, int16_t y, int16_t w,
-                                          int16_t h, bool invert, bool mirror_y,
-                                          bool pgm) {
-  writeImagePart(bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert,
-                 mirror_y, pgm);
+void GxEPD2_266_DEPG0266BN::drawImagePart(const uint8_t bitmap[], int16_t x_part, int16_t y_part, int16_t w_bitmap,
+                                          int16_t h_bitmap, int16_t x, int16_t y, int16_t w, int16_t h, bool invert,
+                                          bool mirror_y, bool pgm) {
+  writeImagePart(bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
   refresh(x, y, w, h);
-  writeImagePartAgain(bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                      invert, mirror_y, pgm);
+  writeImagePartAgain(bitmap, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
 }
 
-void GxEPD2_266_DEPG0266BN::drawImagePart_4G(
-    const uint8_t bitmap[], uint8_t bpp, int16_t x_part, int16_t y_part,
-    int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
-    int16_t h, bool invert, bool mirror_y, bool pgm) {
-  writeImagePart_4G(bitmap, bpp, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h,
-                    invert, mirror_y, pgm);
+void GxEPD2_266_DEPG0266BN::drawImagePart_4G(const uint8_t bitmap[], uint8_t bpp, int16_t x_part, int16_t y_part,
+                                             int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                             int16_t h, bool invert, bool mirror_y, bool pgm) {
+  writeImagePart_4G(bitmap, bpp, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
   refresh(x, y, w, h);
 }
 
-void GxEPD2_266_DEPG0266BN::drawImage(const uint8_t* black,
-                                      const uint8_t* color, int16_t x,
-                                      int16_t y, int16_t w, int16_t h,
-                                      bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::drawImage(const uint8_t* black, const uint8_t* color, int16_t x, int16_t y, int16_t w,
+                                      int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (black) {
     drawImage(black, x, y, w, h, invert, mirror_y, pgm);
   }
 }
 
-void GxEPD2_266_DEPG0266BN::drawImagePart(
-    const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part,
-    int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
-    int16_t h, bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::drawImagePart(const uint8_t* black, const uint8_t* color, int16_t x_part, int16_t y_part,
+                                          int16_t w_bitmap, int16_t h_bitmap, int16_t x, int16_t y, int16_t w,
+                                          int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (black) {
-    drawImagePart(black, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert,
-                  mirror_y, pgm);
+    drawImagePart(black, x_part, y_part, w_bitmap, h_bitmap, x, y, w, h, invert, mirror_y, pgm);
   }
 }
 
-void GxEPD2_266_DEPG0266BN::drawNative(const uint8_t* data1,
-                                       const uint8_t* data2, int16_t x,
-                                       int16_t y, int16_t w, int16_t h,
-                                       bool invert, bool mirror_y, bool pgm) {
+void GxEPD2_266_DEPG0266BN::drawNative(const uint8_t* data1, const uint8_t* data2, int16_t x, int16_t y, int16_t w,
+                                       int16_t h, bool invert, bool mirror_y, bool pgm) {
   if (data1) {
     drawImage(data1, x, y, w, h, invert, mirror_y, pgm);
   }
@@ -555,10 +496,8 @@ void GxEPD2_266_DEPG0266BN::refresh(bool partial_update_mode) {
   }
 }
 
-void GxEPD2_266_DEPG0266BN::refresh(int16_t x, int16_t y, int16_t w,
-                                    int16_t h) {
-  if (_initial_refresh)
-    return refresh(false);  // initial update needs be full update
+void GxEPD2_266_DEPG0266BN::refresh(int16_t x, int16_t y, int16_t w, int16_t h) {
+  if (_initial_refresh) return refresh(false);  // initial update needs be full update
   if (_refresh_mode == forced_full_refresh) return refresh(false);
   // intersection with screen
   int16_t w1 = x < 0 ? w + x : w;                              // reduce
@@ -593,8 +532,7 @@ void GxEPD2_266_DEPG0266BN::hibernate() {
   }
 }
 
-void GxEPD2_266_DEPG0266BN::_setPartialRamArea(uint16_t x, uint16_t y,
-                                               uint16_t w, uint16_t h) {
+void GxEPD2_266_DEPG0266BN::_setPartialRamArea(uint16_t x, uint16_t y, uint16_t w, uint16_t h) {
   _writeCommand(0x11);  // set ram entry mode
   _writeData(0x03);     // x increase, y increase : normal mode
   _writeCommand(0x44);
@@ -665,29 +603,24 @@ void GxEPD2_266_DEPG0266BN::_InitDisplay() {
 
 // full screen update LUT 0~3 gray
 const unsigned char GxEPD2_266_DEPG0266BN::lut_4G[] PROGMEM = {
-    0x40, 0x48, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,  // VS L0 (red 0, black 0) white
-    0x08, 0x48, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,  // VS L1 (red 1, black 0) light grey
-    0x02, 0x48, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,  // VS L2 (red 0, black 1) dark grey
-    0x20, 0x48, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,  // VS L3 (red 1, black 1) black
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00,                                      // VS L4 (vcom)
-    0x0A, 0x19, 0x00, 0x03, 0x08, 0x00, 0x00,              // TP 0 RP0 @60
-    0x14, 0x01, 0x00, 0x14, 0x01, 0x00, 0x03,              // TP 1 RP1
-    0x0A, 0x03, 0x00, 0x08, 0x19, 0x00, 0x00,              // TP 2 RP2
-    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,              // TP 3 RP3
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 4 RP4
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 5 RP5
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 6 RP6
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 7 RP7
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 8 RP8
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 9 RP9
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 10 RP10
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,              // TP 11 RP11
-    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00,  // @144
+    0x40, 0x48, 0x80, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // VS L0 (red 0, black 0) white
+    0x08, 0x48, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // VS L1 (red 1, black 0) light grey
+    0x02, 0x48, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // VS L2 (red 0, black 1) dark grey
+    0x20, 0x48, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // VS L3 (red 1, black 1) black
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,  // VS L4 (vcom)
+    0x0A, 0x19, 0x00, 0x03, 0x08, 0x00, 0x00,                                // TP 0 RP0 @60
+    0x14, 0x01, 0x00, 0x14, 0x01, 0x00, 0x03,                                // TP 1 RP1
+    0x0A, 0x03, 0x00, 0x08, 0x19, 0x00, 0x00,                                // TP 2 RP2
+    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,                                // TP 3 RP3
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 4 RP4
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 5 RP5
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 6 RP6
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 7 RP7
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 8 RP8
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 9 RP9
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 10 RP10
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                // TP 11 RP11
+    0x22, 0x22, 0x22, 0x22, 0x22, 0x22, 0x00, 0x00, 0x00,                    // @144
     0x22, 0x17, 0x41, 0x00, 0x32, 0x1C};
 
 void GxEPD2_266_DEPG0266BN::_Force_Init_Full() {
