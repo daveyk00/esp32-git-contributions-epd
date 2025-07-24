@@ -50,11 +50,15 @@ After saving your configuration the device will restart with the updated setting
     that I couldn't disable
   - This specific board wasn't listed as supported by the greyscale gfx library however using one with similar specs did
     the trick
+  - https://www.aliexpress.com/item/32869729970.html - GDEM0213B74 was the one I ordered 
+
 - 3.7V 1200mAh 603450 battery
   - 50mm x 34mm x 6mm
   - Great size for this project, fits quite snugly. A thinner battery might need something to prevent rattling around 
     like some double sided tape
-  - The Lilygo comes with a 1.25mm 2pin JST connector so don't need to worry about finding one with that connector
+  - ~~The Lilygo comes with a 1.25mm 2pin JST connector so don't need to worry about finding one with that connector~~
+  - It is actually Molex PicoBlade 1.25mm 2-pin male - https://www.ebay.com.au/itm/174222698007 so either get a battery with that or cut and join the connectors
+
 - 3d printed case and stand available for free on [MakerWorld](https://makerworld.com/en/models/1427537-lilygo-t5-2-13-3d-printed-case#profileId-1483837)
 
   - Buttons and switch, secured lid with screws, thin screen bezels and a mechanism to keep the screen firmly at the
@@ -115,8 +119,9 @@ To install the latest precompiled build on your esp32
 1. Download the latest zip from the [releases page](https://github.com/HarryHighPants/esp32-git-contributions-epd/releases)
    and unzip it
 2. Connect your esp32 to your computer via USB
-3. Run `ls /dev/cu.usbserial-*` to find the serial port of your esp32
-4. Run `esptool.py --chip esp32 --port <SERIAL_PORT> --baud 115200 write_flash -z 0x1000 bootloader.bin 0x8000 partitions.bin 0x10000 firmware.bin`
+3. `lsusb -T` to find the serial port
+4. `pip install esptool`
+5. `esptool.py --chip esp32 --port <SERIAL_PORT> --baud 115200 write_flash -z 0x1000 esp32-git-contributions-epd.ino.bootloader.bin 0x8000 esp32-git-contributions-epd.ino.partitions.bin 0x10000 esp32-git-contributions-epd.ino.bin`
    - Where `<SERIAL_PORT>` is the serial port of your esp32from the previous step
 
 ## Development
